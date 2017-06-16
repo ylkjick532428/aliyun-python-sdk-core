@@ -17,7 +17,7 @@
 
 # coding=utf-8
 __author__ = 'alex jiang'
-from .compat import httplib
+from ..compat import httplib
 
 from .http_request import HttpRequest
 from . import protocol_type as PT

@@ -20,7 +20,8 @@
 # coding=utf-8
 import os
 import sys
-import httplib
+from .compat import httplib
+
 import warnings
 warnings.filterwarnings("once", category=DeprecationWarning)
 

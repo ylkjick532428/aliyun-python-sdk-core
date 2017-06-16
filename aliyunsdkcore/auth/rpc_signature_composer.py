@@ -23,8 +23,11 @@ import sys
 
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
-import sha_hmac1 as mac1
-import urllib
+
+from . import sha_hmac1 as mac1
+from ..compat import pathname2url, urlencode
+
+
 from ..utils import parameter_helper as helper
 
 
@@ -55,7 +58,7 @@ def __refresh_sign_parameters(
 
 
 def __pop_standard_urlencode(query):
-    ret = urllib.urlencode(query)
+    ret = urlencode(query)
     ret = ret.replace('+', '%20')
     ret = ret.replace('*', '%2A')
     ret = ret.replace('%7E', '~')
@@ -66,7 +69,8 @@ def __compose_string_to_sign(method, queries):
     canonicalized_query_string = ""
     sorted_parameters = sorted(queries.items(), key=lambda queries: queries[0])
     string_to_sign = method + "&%2F&" + \
-        urllib.pathname2url(__pop_standard_urlencode(sorted_parameters))
+            pathname2url(__pop_standard_urlencode(sorted_parameters))
+
     return string_to_sign
 
 

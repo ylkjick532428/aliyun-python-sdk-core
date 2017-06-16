@@ -23,7 +23,9 @@ import sys
 
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
-import sha_hmac1 as mac1
+from . import sha_hmac1 as mac1
+from hashlib import sha1 as mac1
+
 from ..utils import parameter_helper as helper
 from ..http import format_type as FormatType
 import urllib

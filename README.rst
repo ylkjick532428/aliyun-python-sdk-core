@@ -11,7 +11,7 @@ library, or script with Aliyun services.
 This module works on Python versions:
 
    * 2.6.5 and greater
-
+   * 3.2 and greater, compat by Gikoluo
 
 Documentation:
 

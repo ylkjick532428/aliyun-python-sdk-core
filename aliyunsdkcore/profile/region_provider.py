@@ -22,10 +22,10 @@
 import os
 import sys
 
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, parent_dir)
-from acs_exception import error_code, error_msg
-from acs_exception.exceptions import ClientException
+
+
+from ..acs_exception import error_code, error_msg
+from ..acs_exception.exceptions import ClientException
 from xml.dom.minidom import parse
 
 
@@ -40,6 +40,7 @@ Created on 6/12/2015
 # endpoint list
 __endpoints = dict()
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # load endpoints info from endpoints.xml file and parse to dict.
 __endpoints_file = os.path.join(parent_dir, 'endpoints.xml')
 try:

@@ -21,8 +21,6 @@ __author__ = 'alex jiang'
 import os
 import sys
 
-parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, parentdir)
 from . import format_type
 from ..utils import parameter_helper as helper
 

@@ -53,6 +53,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="Apache",
     url=URL,
+    zip_safe = False,
     keywords=["aliyun", "sdk", "core"],
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,

@@ -22,6 +22,7 @@ __author__ = 'alex jiang'
 XML = 'XML'
 JSON = 'JSON'
 RAW = 'RAW'
+APPLICATION_FORM = 'application/x-www-form-urlencoded'
 APPLICATION_XML = 'application/xml'
 APPLICATION_JSON = 'application/json'
 APPLICATION_OCTET_STREAM = 'application/octet-stream'
@@ -45,9 +46,9 @@ def map_accept_to_format(accept):
 
 
 if __name__ == "__main__":
-    print ( map_format_to_accept(XML) )
-    print ( map_format_to_accept(JSON) )
-    print ( map_format_to_accept(RAW) )
-    print ( map_accept_to_format("application/xml") )
-    print ( map_accept_to_format("text/xml") )
-    print ( map_accept_to_format("application/json") )
+    print (map_format_to_accept(XML))
+    print (map_format_to_accept(JSON))
+    print (map_format_to_accept(RAW))
+    print (map_accept_to_format("application/xml"))
+    print (map_accept_to_format("text/xml"))
+    print (map_accept_to_format("application/json"))

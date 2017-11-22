@@ -8,8 +8,6 @@
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
-#
-#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,20 +17,30 @@
 
 # coding=utf-8
 
-"""
-Acs ERROR CODE module.
+__author__ = 'alex jiang'
 
-Created on 6/15/2015
+import hashlib
+import hmac
+import base64
 
-@author: alex jiang
-"""
 
-SDK_INVALID_REGION_ID = 'SDK.InvalidRegionId'
-SDK_SERVER_UNREACHABLE = 'SDK.ServerUnreachable'
-SDK_INVALID_REQUEST = 'SDK.InvalidRequest'
-SDK_MISSING_ENDPOINTS_FILER = 'SDK.MissingEndpointsFiler'
-SDK_UNKNOWN_SERVER_ERROR = 'SDK.UnknownServerError'
-SDK_INVALID_CREDENTIAL = 'SDK.InvalidCredential'
-SDK_INVALID_SESSION_EXPIRATION = 'SDK.InvalidSessionExpiration'
-SDK_GET_SESSION_CREDENTIAL_FAILED = 'SDK.GetSessionCredentialFailed'
-SDK_INVALID_PARAMS = 'SDK.InvalidParams'
+def get_sign_string(source, secret):
+    print (secret)
+#     if isinstance(secret, unicode):
+#         secret = str(secret)
+    print (secret.encode("utf8"), source)
+    h = hmac.new(secret.encode("utf8"), source.encode("utf8"), hashlib.sha1)
+    signature = base64.encodestring(h.digest()).strip()
+    return signature
+
+
+def get_signer_name():
+    return "HMAC-SHA1"
+
+
+def get_singer_version():
+    return "1.0"
+
+
+def get_signer_type():
+    return ""

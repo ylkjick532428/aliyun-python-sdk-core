@@ -22,14 +22,19 @@
 import os
 import sys
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parent_dir)
 
-from .http import protocol_type as PT
-from .http import method_type as MT
-from .http import format_type as FT
-from .auth import rpc_signature_composer as rpc_signer
-from .auth import roa_signature_composer as roa_signer
-from .auth import oss_signature_composer as oss_signer
-from .auth import md5_tool
+from .http import protocol_type
+from .http import method_type as mt
+from .http import format_type as ft
+from .auth.composer import rpc_signature_composer as rpc_signer
+from .auth.composer import roa_signature_composer as roa_signer
+from .auth.composer import oss_signature_composer as oss_signer
+from .auth.utils import md5_tool
+from aliyunsdkcore.auth.algorithm import sha_hmac1
+from aliyunsdkcore.acs_exception import exceptions
+from aliyunsdkcore.acs_exception import error_code
 import abc
 import base64
 
@@ -45,6 +50,23 @@ STYLE_RPC = 'RPC'
 STYLE_ROA = 'ROA'
 STYLE_OSS = 'OSS'
 
+_default_protocol_type = protocol_type.HTTP
+
+def set_default_protocol_type(user_protocol_type):
+    global _default_protocol_type
+
+    if user_protocol_type == protocol_type.HTTP or user_protocol_type == protocol_type.HTTPS:
+        _default_protocol_type = user_protocol_type
+    else:
+        raise exceptions.ClientException(
+            error_code.SDK_INVALID_PARAMS, 
+            "Invalid 'protocol_type', should be 'http' or 'https'"
+        )
+
+
+def get_default_protocol_type():
+    return _default_protocol_type
+
 
 class AcsRequest:
     """
@@ -55,8 +77,9 @@ class AcsRequest:
     def __init__(self, product, version=None,
                  action_name=None,
                  location_service_code=None,
+                 location_endpoint_type='openAPI',
                  accept_format=None,
-                 protocol_type=PT.HTTP,
+                 protocol_type=None,
                  method=None):
         """
 
@@ -69,77 +92,87 @@ class AcsRequest:
         :param accept_format:
         :return:
         """
-        self.__version = version
-        self.__product = product
-        self.__action_name = action_name
-        self.__protocol_type = protocol_type
-        self.__accept_format = accept_format
-        self.__params = {}
-        self.__method = method
-        self.__header = {}
-        self.__uri_pattern = None
-        self.__uri_params = None
-        self.__content = None
-        self.__location_service_code = location_service_code
+        self._version = version
+        self._product = product
+        self._action_name = action_name
+        self._protocol_type = protocol_type
+        if self._protocol_type is None:
+            self._protocol_type = _default_protocol_type
+
+        self._accept_format = accept_format
+        self._params = {}
+        self._method = method
+        self._header = {}
+        self._body_params = {}
+        self._uri_pattern = None
+        self._uri_params = None
+        self._content = None
+        self._location_service_code = location_service_code
+        self._location_endpoint_type = location_endpoint_type
+        self.add_header('x-sdk-invoke-type', 'normal')
 
     def add_query_param(self, k, v):
-        if self.__params is None:
-            self.__params = {}
-        self.__params[k] = v
+        self._params[k] = v
+
+    def add_body_params(self, k, v):
+        self._body_params[k] = v
+
+    def get_body_params(self):
+        return self._body_params
 
     def get_uri_pattern(self):
-        return self.__uri_pattern
+        return self._uri_pattern
 
     def get_uri_params(self):
-        return self.__uri_params
+        return self._uri_params
 
     def get_product(self):
-        return self.__product
+        return self._product
 
     def get_version(self):
-        return self.__version
+        return self._version
 
     def get_action_name(self):
-        return self.__action_name
+        return self._action_name
 
     def get_accept_format(self):
-        return self.__accept_format
+        return self._accept_format
 
     def get_protocol_type(self):
-        return self.__protocol_type
+        return self._protocol_type
 
     def get_query_params(self):
-        return self.__params
+        return self._params
 
     def get_method(self):
-        return self.__method
+        return self._method
 
     def set_uri_pattern(self, pattern):
-        self.__uri_pattern = pattern
+        self._uri_pattern = pattern
 
     def set_uri_params(self, params):
-        self.__uri_params = params
+        self._uri_params = params
 
     def set_method(self, method):
-        self.__method = method
+        self._method = method
 
     def set_product(self, product):
-        self.__product = product
+        self._product = product
 
     def set_version(self, version):
-        self.__version = version
+        self._version = version
 
     def set_action_name(self, action_name):
-        self.__action_name = action_name
+        self._action_name = action_name
 
     def set_accept_format(self, accept_format):
-        self.__accept_format = accept_format
+        self._accept_format = accept_format
 
     def set_protocol_type(self, protocol_type):
-        self.__protocol_type = protocol_type
+        self._protocol_type = protocol_type
 
     def set_query_params(self, params):
-        self.__params = params
+        self._params = params
 
     def set_content(self, content):
         """
@@ -147,21 +180,21 @@ class AcsRequest:
         :param content: ByteArray
         :return:
         """
-        self.__content = content
+        self._content = content
 
     def get_content(self):
         """
 
         :return: ByteArray
         """
-        return self.__content
+        return self._content
 
     def get_headers(self):
         """
 
         :return: Dict
         """
-        return self.__header
+        return self._header
 
     def set_headers(self, headers):
         """
@@ -169,22 +202,28 @@ class AcsRequest:
         :param headers: Dict
         :return:
         """
-        self.__header = headers
+        self._header = headers
 
     def add_header(self, k, v):
-        if self.__header is None:
-            self.__header = dict(k=v)
-        else:
-            self.__header[k] = v
+        self._header[k] = v
 
     def set_user_agent(self, agent):
         self.add_header('User-Agent', agent)
 
     def set_location_service_code(self, location_service_code):
-        self.__location_service_code = location_service_code
+        self._location_service_code = location_service_code
 
     def get_location_service_code(self):
-        return self.__location_service_code
+        return self._location_service_code
+
+    def get_location_endpoint_type(self):
+        return self._location_endpoint_type
+
+    def set_content_type(self, content_type):
+        self.add_header("Content-Type", content_type)
+
+    def get_location_endpoint_type(self):
+        return self._location_endpoint_type
 
     @abc.abstractmethod
     def get_style(self):
@@ -210,33 +249,38 @@ class RpcRequest(AcsRequest):
             version,
             action_name,
             location_service_code=None,
+            location_endpoint_type='openAPI',
             format=None,
-            protocol=None):
+            protocol=None,
+            signer=sha_hmac1):
         AcsRequest.__init__(
             self,
             product,
             version,
             action_name,
             location_service_code,
+            location_endpoint_type,
             format,
             protocol,
-            MT.GET)
-        self.__style = STYLE_RPC
+            mt.GET)
+        self._style = STYLE_RPC
+        self._signer = signer
 
     def get_style(self):
-        return self.__style
+        return self._style
 
-    def __get_sign_params(self):
+    def _get_sign_params(self):
         req_params = self.get_query_params()
         if req_params is None:
             req_params = {}
         req_params['Version'] = self.get_version()
         req_params['Action'] = self.get_action_name()
         req_params['Format'] = self.get_accept_format()
+
         return req_params
 
     def get_url(self, region_id, ak, secret):
-        sign_params = self.__get_sign_params()
+        sign_params = self._get_sign_params()
         if 'RegionId' not in sign_params.keys():
             sign_params['RegionId'] = region_id
         url = rpc_signer.get_signed_url(
@@ -244,7 +288,9 @@ class RpcRequest(AcsRequest):
             ak,
             secret,
             self.get_accept_format(),
-            self.get_method())
+            self.get_method(),
+            self.get_body_params(),
+            self._signer)
         return url
 
     def get_signed_header(self, region_id=None, ak=None, secret=None):
@@ -262,6 +308,7 @@ class RoaRequest(AcsRequest):
             version,
             action_name,
             location_service_code=None,
+            location_endpoint_type='openAPI',
             method=None,
             headers=None,
             uri_pattern=None,
@@ -285,40 +332,43 @@ class RoaRequest(AcsRequest):
             version,
             action_name,
             location_service_code,
-            FT.RAW,
+            location_endpoint_type,
+            ft.RAW,
             protocol,
             method)
-        self.__style = STYLE_ROA
-        self.__method = method
-        self.__header = headers
-        self.__uri_pattern = uri_pattern
-        self.__path_params = path_params
+        self._style = STYLE_ROA
+        self._method = method
+        if headers:
+            self._header = headers
+        self._uri_pattern = uri_pattern
+        self._path_params = path_params
 
     def get_style(self):
         """
 
         :return: String
         """
-        return self.__style
+        return self._style
 
     def get_path_params(self):
-        return self.__path_params
+        return self._path_params
 
     def set_path_params(self, path_params):
-        self.__path_params = path_params
+        self._path_params = path_params
 
     def add_path_param(self, k, v):
-        if self.__path_params is None:
-            self.__path_params = {}
-        self.__path_params[k] = v
+        if self._path_params is None:
+            self._path_params = {}
+        self._path_params[k] = v
 
-    def __get_sign_params(self):
+    def _get_sign_params(self):
         req_params = self.get_query_params()
         if req_params is None:
             req_params = {}
-        req_params['Version'] = self.get_version()
-        req_params['Action'] = self.get_action_name()
-        req_params['Format'] = self.get_accept_format()
+        self.add_header("x-acs-version", self.get_version())
+        # req_params['Version'] = self.get_version()
+        # req_params['Action'] = self.get_action_name()
+        # req_params['Format'] = self.get_accept_format()
         return req_params
 
     def get_signed_header(self, region_id, ak, secret):
@@ -329,12 +379,12 @@ class RoaRequest(AcsRequest):
         :param secret: String
         :return: Dict
         """
-        sign_params = self.get_query_params()
-        if (self.get_content() is not None):
+        sign_params = self._get_sign_params()
+        if self.get_content() is not None:
             md5_str = md5_tool.get_md5_base64_str(self.get_content())
             self.add_header('Content-MD5', md5_str)
-        if 'RegionId' not in sign_params.keys():
-            sign_params['RegionId'] = region_id
+        # if 'RegionId' not in sign_params.keys():
+        #     sign_params['RegionId'] = region_id
         signed_headers = roa_signer.get_signature_headers(
             sign_params,
             ak,
@@ -353,8 +403,8 @@ class RoaRequest(AcsRequest):
         :return: String
         """
         sign_params = self.get_query_params()
-        if region_id not in sign_params.keys():
-            sign_params['RegionId'] = region_id
+        # if region_id not in sign_params.keys():
+        #     sign_params['RegionId'] = region_id
         url = roa_signer.get_url(
             self.get_uri_pattern(),
             sign_params,
@@ -394,7 +444,8 @@ class OssRequest(AcsRequest):
             version,
             action_name,
             location_service_code,
-            FT.XML,
+            'openAPI',
+            ft.XML,
             protocol,
             method)
         self.__style = STYLE_OSS
@@ -468,3 +519,79 @@ class OssRequest(AcsRequest):
             self.get_uri_pattern(),
             self.get_path_params())
         return url
+
+
+class CommonRequest(RpcRequest, RoaRequest):
+    def __init__(self, domain=None, version=None, action_name=None, uri_pattern=None, product=None):
+        RoaRequest.__init__(self, product, version, action_name)
+        RpcRequest.__init__(self, product, version, action_name)
+
+        self._domain = domain
+        self._version = version
+        self._action_name = action_name
+        self._uri_pattern = uri_pattern
+        self._product = product
+        self._location_endpoint_type = 'openAPI',
+        self._signer = sha_hmac1
+        self.add_header('x-sdk-invoke-type', 'common')
+
+    def set_domain(self, domain):
+        self._domain = domain
+
+    def get_domain(self):
+        return self._domain
+
+    def set_version(self, version):
+        self._version = version
+
+    def get_version(self):
+        return self._version
+
+    def set_action_name(self, action_name):
+        self._action_name = action_name
+
+    def get_action_name(self):
+        return self._action_name
+
+    def set_uri_pattern(self, uri_pattern):
+        self._uri_pattern = uri_pattern
+
+    def get_uri_pattern(self):
+        return self._uri_pattern
+
+    def set_product(self, product):
+        self._product = product
+
+    def get_product(self):
+        return self._product
+
+    def trans_to_acs_request(self):
+        if not self._version:
+            raise exceptions.ClientException(error_code.SDK_INVALID_PARAMS,
+                                             'common params [version] is required, cannot be empty')
+        if not self._action_name and not self._uri_pattern:
+            raise exceptions.ClientException(error_code.SDK_INVALID_PARAMS,
+                                             'At least one of [action] and [uri_pattern] has a value')
+        if not self._domain and not self._product:
+            raise exceptions.ClientException(error_code.SDK_INVALID_PARAMS,
+                                             'At least one of [domain] and [product_name] has a value')
+
+        if self._uri_pattern:
+            self._style = STYLE_ROA
+        else:
+            self._style = STYLE_RPC
+
+    def get_style(self):
+        return self._style
+
+    def get_url(self, region_id, ak, secret):
+        if self._style == STYLE_RPC:
+            return RpcRequest.get_url(self, region_id, ak, secret)
+        else:
+            return RoaRequest.get_url(self, region_id, ak, secret)
+
+    def get_signed_header(self, region_id, ak, secret):
+        if self._style == STYLE_RPC:
+            return RpcRequest.get_signed_header(self, region_id, ak, secret)
+        else:
+            return RoaRequest.get_signed_header(self, region_id, ak, secret)

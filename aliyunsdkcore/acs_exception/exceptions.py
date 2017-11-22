@@ -27,7 +27,7 @@ Created on 6/15/2015
 @author: alex jiang
 """
 
-from . import error_type
+import aliyunsdkcore.acs_exception.error_type as error_type
 
 
 class ClientException(Exception):

@@ -18,21 +18,33 @@
 # under the License.
 
 # coding=utf-8
+import urllib
+import sys
 
 """
-Acs ERROR CODE module.
+Acs url encoder module.
 
-Created on 6/15/2015
+Created on 6/16/2015
 
-@author: alex jiang
+@author: alex
 """
 
-SDK_INVALID_REGION_ID = 'SDK.InvalidRegionId'
-SDK_SERVER_UNREACHABLE = 'SDK.ServerUnreachable'
-SDK_INVALID_REQUEST = 'SDK.InvalidRequest'
-SDK_MISSING_ENDPOINTS_FILER = 'SDK.MissingEndpointsFiler'
-SDK_UNKNOWN_SERVER_ERROR = 'SDK.UnknownServerError'
-SDK_INVALID_CREDENTIAL = 'SDK.InvalidCredential'
-SDK_INVALID_SESSION_EXPIRATION = 'SDK.InvalidSessionExpiration'
-SDK_GET_SESSION_CREDENTIAL_FAILED = 'SDK.GetSessionCredentialFailed'
-SDK_INVALID_PARAMS = 'SDK.InvalidParams'
+
+def get_encode_str(params):
+    """
+    transforms parameters to encoded string
+    :param params: dict parameters
+    :return: string
+    """
+    list_params = sorted(params.iteritems(), key=lambda d: d[0])
+    encode_str = urllib.urlencode(list_params)
+    if sys.stdin.encoding is None:
+        res = urllib.quote(encode_str.decode('cp936').encode('utf8'), '')
+    else:
+        res = urllib.quote(
+            encode_str.decode(
+                sys.stdin.encoding).encode('utf8'), '')
+    res = res.replace("+", "%20")
+    res = res.replace("*", "%2A")
+    res = res.replace("%7E", "~")
+    return res

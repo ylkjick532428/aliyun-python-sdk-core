@@ -352,7 +352,7 @@
             <Product><ProductName>oceanbase</ProductName><DomainName>oceanbase.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Workorder</ProductName><DomainName>workorder.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Yundunhsm</ProductName><DomainName>yundunhsm.aliyuncs.com</DomainName></Product>
-            <Product><ProductName>Iot</ProductName><DomainName>iot.aliyuncs.com</DomainName></Product>
+            <Product><ProductName>Iot</ProductName><DomainName>iot.cn-shanghai.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Bss</ProductName><DomainName>bss.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Oms</ProductName><DomainName>oms.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Ubsms</ProductName><DomainName>ubsms.aliyuncs.com</DomainName></Product>
@@ -514,7 +514,7 @@
             <Product><ProductName>oceanbase</ProductName><DomainName>oceanbase.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Workorder</ProductName><DomainName>workorder.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Yundunhsm</ProductName><DomainName>yundunhsm.aliyuncs.com</DomainName></Product>
-            <Product><ProductName>Iot</ProductName><DomainName>iot.aliyuncs.com</DomainName></Product>
+            <Product><ProductName>Iot</ProductName><DomainName>iot.us-west-1.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Alert</ProductName><DomainName>alert.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Oms</ProductName><DomainName>oms.aliyuncs.com</DomainName></Product>
             <Product><ProductName>live</ProductName><DomainName>live.aliyuncs.com</DomainName></Product>
@@ -1276,7 +1276,7 @@
             <Product><ProductName>oceanbase</ProductName><DomainName>oceanbase.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Workorder</ProductName><DomainName>workorder.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Yundunhsm</ProductName><DomainName>yundunhsm.aliyuncs.com</DomainName></Product>
-            <Product><ProductName>Iot</ProductName><DomainName>iot.aliyuncs.com</DomainName></Product>
+            <Product><ProductName>Iot</ProductName><DomainName>iot.ap-southeast-1.aliyuncs.com</DomainName></Product>
             <Product><ProductName>HPC</ProductName><DomainName>hpc.aliyuncs.com</DomainName></Product>
             <Product><ProductName>jaq</ProductName><DomainName>jaq.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Oms</ProductName><DomainName>oms.aliyuncs.com</DomainName></Product>
@@ -1334,6 +1334,7 @@
             <Product><ProductName>Kms</ProductName><DomainName>kms.eu-central-1.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Cms</ProductName><DomainName>metrics.cn-hangzhou.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Slb</ProductName><DomainName>slb.eu-central-1.aliyuncs.com</DomainName></Product>
+	    <Product><ProductName>Emr</ProductName><DomainName>emr.eu-central-1.aliyuncs.com</DomainName></Product>
         </Products>
     </Endpoint>
     <Endpoint name="cn-zhangjiakou">
@@ -1344,6 +1345,7 @@
             <Product><ProductName>Vpc</ProductName><DomainName>vpc.cn-zhangjiakou.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Cms</ProductName><DomainName>metrics.cn-hangzhou.aliyuncs.com</DomainName></Product>
             <Product><ProductName>Slb</ProductName><DomainName>slb.cn-zhangjiakou.aliyuncs.com</DomainName></Product>
+	    <Product><ProductName>Emr</ProductName><DomainName>emr.cn-zhangjiakou.aliyuncs.com</DomainName></Product>
         </Products>
     </Endpoint>
 </Endpoints>

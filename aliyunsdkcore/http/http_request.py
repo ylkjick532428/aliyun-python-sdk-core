@@ -21,7 +21,9 @@ __author__ = 'alex jiang'
 import os
 import sys
 
-from . import format_type
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parentdir)
+import aliyunsdkcore.http.format_type as format_type
 from ..utils import parameter_helper as helper
 
 
@@ -103,7 +105,7 @@ class HttpRequest:
         str_md5 = self.md5_sum(content)
         content_length = len(content)
         content_type = format_type.RAW
-        if format is None:
+        if format is not None:
             content_type = format
         self.__headers[self.content_md5] = str_md5
         self.__headers[self.content_length] = content_length

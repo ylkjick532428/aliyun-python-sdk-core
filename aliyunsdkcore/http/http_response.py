@@ -17,10 +17,10 @@
 
 # coding=utf-8
 __author__ = 'alex jiang'
-from ..compat import httplib
+import http.client as httplib
 
-from .http_request import HttpRequest
-from . import protocol_type as PT
+from aliyunsdkcore.http.http_request import HttpRequest
+import aliyunsdkcore.http.protocol_type as PT
 
 
 class HttpResponse(HttpRequest):
@@ -34,7 +34,8 @@ class HttpResponse(HttpRequest):
             content=None,
             port=None,
             key_file=None,
-            cert_file=None):
+            cert_file=None,
+            timeout=None):
         HttpRequest.__init__(
             self,
             host=host,
@@ -48,6 +49,7 @@ class HttpResponse(HttpRequest):
         self.__cert_file = cert_file
         self.__port = port
         self.__connection = None
+        self._timeout = timeout
         self.set_body(content)
 
     def set_ssl_enable(self, enable):
@@ -73,7 +75,7 @@ class HttpResponse(HttpRequest):
             self.__port = 80
         try:
             self.__connection = httplib.HTTPConnection(
-                self.get_host(), self.__port)
+                self.get_host(), self.__port, timeout=self._timeout)
             self.__connection.connect()
             self.__connection.request(
                 method=self.get_method(),
@@ -90,7 +92,7 @@ class HttpResponse(HttpRequest):
             self.__port = 80
         try:
             self.__connection = httplib.HTTPConnection(
-                self.get_host(), self.__port)
+                self.get_host(), self.__port, timeout=self._timeout)
             self.__connection.connect()
             self.__connection.request(
                 method=self.get_method(),
@@ -111,7 +113,8 @@ class HttpResponse(HttpRequest):
                 self.get_host(),
                 self.__port,
                 cert_file=self.__cert_file,
-                key_file=self.__key_file)
+                key_file=self.__key_file,
+                timeout=self._timeout)
             self.__connection.connect()
             self.__connection.request(
                 method=self.get_method(),
@@ -132,7 +135,8 @@ class HttpResponse(HttpRequest):
                 self.get_host(),
                 self.__port,
                 cert_file=self.__cert_file,
-                key_file=self.__key_file)
+                key_file=self.__key_file,
+                timeout=self._timeout)
             self.__connection.connect()
             self.__connection.request(
                 method=self.get_method(),

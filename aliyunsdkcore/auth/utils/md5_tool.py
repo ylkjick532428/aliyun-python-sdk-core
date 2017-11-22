@@ -8,8 +8,6 @@
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
-#
-#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,19 +18,22 @@
 # coding=utf-8
 
 """
-Acs ERROR CODE module.
+MD5 tools module.
 
-Created on 6/15/2015
+Created on 9/28/2015
 
 @author: alex jiang
 """
 
-SDK_INVALID_REGION_ID = 'SDK.InvalidRegionId'
-SDK_SERVER_UNREACHABLE = 'SDK.ServerUnreachable'
-SDK_INVALID_REQUEST = 'SDK.InvalidRequest'
-SDK_MISSING_ENDPOINTS_FILER = 'SDK.MissingEndpointsFiler'
-SDK_UNKNOWN_SERVER_ERROR = 'SDK.UnknownServerError'
-SDK_INVALID_CREDENTIAL = 'SDK.InvalidCredential'
-SDK_INVALID_SESSION_EXPIRATION = 'SDK.InvalidSessionExpiration'
-SDK_GET_SESSION_CREDENTIAL_FAILED = 'SDK.GetSessionCredentialFailed'
-SDK_INVALID_PARAMS = 'SDK.InvalidParams'
+import hashlib
+import base64
+
+
+def _get_md5(content):
+    m = hashlib.md5()
+    m.update(buffer(content))
+    return m.digest()
+
+
+def get_md5_base64_str(content):
+    return base64.encodestring(_get_md5(content)).strip()

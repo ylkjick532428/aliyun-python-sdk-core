@@ -16,3 +16,9 @@ This module works on Python versions:
 Documentation:
 
 Please visit http://develop.aliyun.com/sdk/python
+
+aliyun_python_sdk_core
+
+
+修改并支持python3.6 短信验证码发送, 其他未测
+aliyun_python_sdk_core-2.6.0-py3.6
